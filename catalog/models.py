@@ -24,7 +24,8 @@ class Product(models.Model):
     description = models.CharField (max_length= 100, blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     category = models.ForeignKey(Category, on_delete= models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     
     def generate_sku(self):
