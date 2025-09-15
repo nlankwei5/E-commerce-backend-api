@@ -50,3 +50,12 @@ class Product(models.Model):
     
     def __str__(self):
         return f"{self.sku} - {self.name}"
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=["sku"]),        
+            models.Index(fields=["name"]),       
+            models.Index(fields=["price"]),      
+            models.Index(fields=["category"]),   
+        ]
+
