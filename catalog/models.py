@@ -13,11 +13,12 @@ def validate_price(value):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, unique=True)
 
 
     def save(self, *args, **kwargs):
-         self.slug = slugify(self.name)
+         if not self.slug:
+            self.slug = slugify(self.name)
          return super().save(*args, **kwargs)
 
     def __str__(self):
@@ -28,7 +29,7 @@ class Product(models.Model):
     name = models.CharField(max_length= 50, blank= False)
     description = models.CharField (max_length= 100, blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=2, validators=[validate_price])
-    category = models.ForeignKey(Category, on_delete= models.CASCADE)
+    category = models.ForeignKey(Category, on_delete= models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -48,4 +49,4 @@ class Product(models.Model):
 
     
     def __str__(self):
-        return self.name
+        return f"{self.sku} - {self.name}"
