@@ -2,9 +2,14 @@ import random
 import string
 from django.db import models
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 
 # Create your models here.
+
+def validate_price(value):
+         if value < 0:
+              raise ValidationError('Price cannot be less than $0.00')
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -22,7 +27,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=30, unique=True, null=True, blank=True)
     name = models.CharField(max_length= 50, blank= False)
     description = models.CharField (max_length= 100, blank=True)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
+    price = models.DecimalField(max_digits=7, decimal_places=2, validators=[validate_price])
     category = models.ForeignKey(Category, on_delete= models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,11 +41,9 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.sku:
             new_sku = self.generate_sku()
-        else:
-             return
-        while Product.objects.filter(sku=new_sku).exists():  
-                new_sku = self.generate_sku()
-        self.sku = new_sku
+            while Product.objects.filter(sku=new_sku).exists():  
+                    new_sku = self.generate_sku()
+            self.sku = new_sku
         return super().save(*args, **kwargs)
 
     
