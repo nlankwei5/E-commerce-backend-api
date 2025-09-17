@@ -9,13 +9,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Create your views here.
-class CategoryViewset(viewsets.ModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CatergorySerializer
 
 
 
-class ProductViewset(viewsets.ReadOnlyModelViewSet):
+class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'sku'
