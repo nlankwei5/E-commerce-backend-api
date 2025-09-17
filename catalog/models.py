@@ -8,8 +8,8 @@ from django.core.exceptions import ValidationError
 # Create your models here.
 
 def validate_price(value):
-         if value < 0:
-              raise ValidationError('Price cannot be less than $0.00')
+        if value < 0:
+            raise ValidationError('Price cannot be less than $0.00')
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -17,9 +17,9 @@ class Category(models.Model):
 
 
     def save(self, *args, **kwargs):
-         if not self.slug:
+        if not self.slug:
             self.slug = slugify(self.name)
-         return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
