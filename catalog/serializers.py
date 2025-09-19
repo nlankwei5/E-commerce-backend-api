@@ -13,7 +13,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'sku', 'name', 'description', 'price', 'category_name','created_at', 'updated_at']
+        fields = ['id', 'sku', 'name', 'description', 'price', 'category', 'category_name','created_at', 'updated_at']
         read_only_fields = ['id', 'sku', 'created_at', 'updated_at']
 
     def validate_price(self, value):
