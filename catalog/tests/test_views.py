@@ -50,5 +50,24 @@ class CategoryAPITestCase(APITestCase):
 
 
 class ProductAPITestCase(APITestCase):
-    pass 
+    
+    def setUp(self):
+        self.category = Category(name = 'electronics')
+        self.category.save()
+        self.product1 = Product(sku ='', name='Iphone', description='', price=24.00, category=self.category)
+        self.product1.save()
 
+    def test_list_category(self):
+        url = reverse("product-list")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data), 1)
+        data = response.data['results']
+        self.assertEqual(data[0]['name'],  self.product1.name)
+    
+    def test_retrieve_product(self):
+        self.url = reverse('product-detail', kwargs={'sku': self.product1.sku})
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['name'], self.product1.name)
