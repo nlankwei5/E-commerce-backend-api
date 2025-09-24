@@ -15,11 +15,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('category')
     serializer_class = ProductSerializer
     lookup_field = 'sku'
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category','category__name', 'price', 'created_at']
+    filterset_fields = ['category', 'price', 'created_at']
     search_fields = ['name']
     ordering_fields = ['price']
 
