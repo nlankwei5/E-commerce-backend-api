@@ -42,8 +42,9 @@ INSTALLED_APPS = [
     'users',
     'rest_framework', 
     'django_filters',
+    'djoser',
+    'rest_framework.authtoken',
     'drf_yasg',
-
 ]
 
 MIDDLEWARE = [
@@ -136,7 +137,21 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter'
         ], 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 20,
+     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
+}
+
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

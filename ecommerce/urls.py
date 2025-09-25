@@ -36,4 +36,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(catalog_router.urls)),
     path('api/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/auth/', include('djoser.urls')),
+    path('api/auth/', include('djoser.urls.jwt'))
 ] 
