@@ -12,7 +12,7 @@ class CartViewSet(viewsets.ModelViewSet):
 class CartItemsViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
-        return CartItem.objects.filter(id=self.kwargs['cart_pk'])
+        return CartItem.objects.filter(cart_id=self.kwargs['cart_pk'])
 
     
 
