@@ -155,3 +155,6 @@ DJOSER = {
 
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+CART_SESSION_ID = 'cart' 
+

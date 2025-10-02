@@ -28,6 +28,12 @@ class ProductSerializer(serializers.ModelSerializer):
         if len(value) > 255:
             raise serializers.ValidationError("Name too long")
         return value
+    
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'sku', 'name',  'price']
+        read_only_fields = ['id', 'sku']
 
 
 
