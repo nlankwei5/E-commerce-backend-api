@@ -59,3 +59,8 @@ class AddCartItemSerializer(serializers.ModelSerializer):
     
     def get_product_sku_out(self, obj):
         return obj.product.sku
+
+class UpdateCartItemSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = CartItem
+        fields = ['quantity']
