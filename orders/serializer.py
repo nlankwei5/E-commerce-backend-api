@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import Cart, CartItem
+from .models import Cart, CartItem, Order, OrderItems
 from catalog.serializers import SimpleProductSerializer
 from catalog.models import Product
+from django.db import transaction
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer(many = False)
@@ -64,3 +65,40 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
     class Meta: 
         model = CartItem
         fields = ['quantity']
+
+
+class OrderSerializer (serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+    class Meta: 
+        model = Order
+        fields = ['id','owner','pending_status', 'placed_at', 'items']
+        
+
+    
+        
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+    class Meta:
+        model = OrderItems
+        fields = ['id', 'product', 'quantity']
+
+class CreateOrderSerializer(serializers.Serializer):
+    cart_id = serializers.IntegerField()
+
+    def save(self, **kwargs):
+        with transaction.atomic():
+            cart_id = self.validated_data['cart_id']
+            user_id = self.context['user_id']
+            order = Order.objects.create(owner_id = user_id)
+            cartitems = CartItem.objects.filter(cart_id=cart_id)
+            orderitems=[
+                OrderItems(
+                    order=order, 
+                    product = item.product, 
+                    quantity=item.quantity) 
+                for item in cartitems
+                    ]
+            OrderItems.objects.bulk_create(orderitems)
+            Cart.objects.filter(id=cart_id).delete()
+        
