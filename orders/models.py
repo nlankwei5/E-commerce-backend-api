@@ -38,9 +38,11 @@ class Order (models.Model):
     owner = models.ForeignKey(User, on_delete=models.PROTECT)
     placed_at = models.DateField(auto_now_add=True)
     pending_status = models.CharField(max_length=50, choices=PAYMENT_STATUS_CHOICES, default='PAYMENT_STATUS_PENDING')
+    grand_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stripe_payment_intent_id = models.CharField(null=True, blank=True)
 
     def __str__(self):
-        return self.pending_status
+         return f"Order #{self.id} - {self.get_pending_status_display()}"
     
 
 class OrderItems(models.Model):

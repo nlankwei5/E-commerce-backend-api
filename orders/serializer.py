@@ -3,6 +3,7 @@ from .models import Cart, CartItem, Order, OrderItems
 from catalog.serializers import SimpleProductSerializer
 from catalog.models import Product
 from django.db import transaction
+from .services import stripe_payment_intent
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer(many = False)
@@ -67,15 +68,14 @@ class UpdateCartItemSerializer(serializers.ModelSerializer):
         fields = ['quantity']
 
 
-class OrderSerializer (serializers.ModelSerializer):
+class OrderSerializer (serializers.ModelSerializer): 
     items = CartItemSerializer(many=True, read_only=True)
+
     class Meta: 
         model = Order
-        fields = ['id','owner','pending_status', 'placed_at', 'items']
-        
+        fields = ['id','owner','pending_status', 'placed_at', 'items', 'grand_total']
 
-    
-        
+     
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
@@ -90,8 +90,14 @@ class CreateOrderSerializer(serializers.Serializer):
         with transaction.atomic():
             cart_id = self.validated_data['cart_id']
             user_id = self.context['user_id']
-            order = Order.objects.create(owner_id = user_id)
             cartitems = CartItem.objects.filter(cart_id=cart_id)
+
+            if not cartitems.exists():
+                raise serializers.ValidationError("Cart is empty.")
+            
+            total = sum(item.product.price * item.quantity for item in cartitems)
+            order = Order.objects.create(owner_id = user_id, grand_total=total, )
+
             orderitems=[
                 OrderItems(
                     order=order, 
@@ -101,4 +107,13 @@ class CreateOrderSerializer(serializers.Serializer):
                     ]
             OrderItems.objects.bulk_create(orderitems)
             Cart.objects.filter(id=cart_id).delete()
+
+            client_secret = stripe_payment_intent(order)
+
+    
+            return {
+                "order_id": order.id,
+                "client_secret": client_secret,
+                "amount": total,
+            }
         
