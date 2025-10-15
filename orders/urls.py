@@ -1,6 +1,7 @@
 from rest_framework import routers
 from rest_framework_nested import routers 
 from .views import *
+from django.urls import path
 
 router = routers.DefaultRouter()
 router.register(r'cart', CartViewSet)
@@ -11,5 +12,5 @@ cart_router.register(r'items', CartItemsViewSet, basename='items')
 
 
 
-urlpatterns = router.urls
+urlpatterns = [router.urls, path('webhook/', my_webhook_view, name='stripe-webhook'),]
 

@@ -3,6 +3,12 @@ from rest_framework import viewsets
 from .models import Cart, CartItem, Order
 from .serializer import *
 from rest_framework.permissions import IsAuthenticated
+import stripe
+import json
+from django.http import HttpResponse, JsonResponse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from .services import handle_successful_payment
 
 # Create your views here.
 
@@ -47,3 +53,50 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_serializer_context(self):
         return {'user_id': self.request.user.id}
+
+
+
+endpoint_secret = settings.STRIPE_WEBHOOK
+
+@csrf_exempt
+def my_webhook_view(request):
+    payload = request.body
+    event = None
+
+    try:
+        event = stripe.Event.construct_from(
+        json.loads(payload), stripe.api_key
+        )
+    except ValueError as e:
+        # Invalid payload
+        return HttpResponse(status=400)
+
+    if endpoint_secret:
+            # Only verify the event if you've defined an endpoint secret
+            # Otherwise, use the basic event deserialized with JSON
+            sig_header = request.headers.get('stripe-signature')
+            try:
+                event = stripe.Webhook.construct_event(
+                    payload, sig_header, endpoint_secret
+                )
+            except stripe.error.SignatureVerificationError as e:
+                print('⚠️  Webhook signature verification failed.' + str(e))
+                return JsonResponse(success=False)
+
+    # Handle the event
+    if event.type == 'payment_intent.succeeded':
+        payment_intent = event.data.object # contains a stripe.PaymentIntent
+        handle_successful_payment(payment_intent)
+        # Then define and call a method to handle the successful payment intent.
+        # handle_payment_intent_succeeded(payment_intent)
+    elif event.type == 'payment_method.attached':
+        payment_method = event.data.object # contains a stripe.PaymentMethod
+        # Then define and call a method to handle the successful attachment of a PaymentMethod.
+        # handle_payment_method_attached(payment_method)
+    # ... handle other event types
+    else:
+        print('Unhandled event type {}'.format(event.type))
+
+    return HttpResponse(status=200)
+
+    

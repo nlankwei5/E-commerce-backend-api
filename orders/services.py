@@ -1,5 +1,6 @@
 import stripe
 from django.conf import settings
+from .models import Order
 
 
 
@@ -15,4 +16,30 @@ def stripe_payment_intent(order):
     order.stripe_payment_intent_id = payment_intent.id
     order.save()
     return payment_intent.client_secret
+
+
+def handle_successful_payment(order, intent):
+    
+    order_id = intent.get("metadata", {}).get("order_id")
+
+    if not order_id:
+        print("No order_id found in PaymentIntent metadata.")
+        return
+
+ 
+    try:
+        order = Order.objects.get(id=order_id)
+    except Order.DoesNotExist:
+        raise "Order with ID {order_id} not found."
+
+
+      
+    order.pending_status = "C"  # 
+    order.stripe_payment_intent_id = intent["id"]
+    order.save()
+
+    
+    
+    
+   
 
