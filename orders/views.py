@@ -56,10 +56,12 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 
-endpoint_secret = settings.STRIPE_WEBHOOK
+
 
 @csrf_exempt
 def my_webhook_view(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    endpoint_secret = settings.STRIPE_WEBHOOK
     payload = request.body
     event = None
 

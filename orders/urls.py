@@ -12,5 +12,9 @@ cart_router.register(r'items', CartItemsViewSet, basename='items')
 
 
 
-urlpatterns = [router.urls, path('webhook/', my_webhook_view, name='stripe-webhook'),]
+urlpatterns = [
+            *router.urls, 
+            *cart_router.urls,
+            path('webhook/', my_webhook_view, name='stripe-webhook'),
+            ]
 
