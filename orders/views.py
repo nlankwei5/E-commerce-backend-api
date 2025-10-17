@@ -8,7 +8,7 @@ import json
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from .services import handle_successful_payment
+from .services import handle_successful_payment, handle_payment_confirmed
 
 # Create your views here.
 
@@ -89,6 +89,7 @@ def my_webhook_view(request):
     if event.type == 'payment_intent.succeeded':
         payment_intent = event.data.object # contains a stripe.PaymentIntent
         handle_successful_payment(payment_intent)
+
         # Then define and call a method to handle the successful payment intent.
         # handle_payment_intent_succeeded(payment_intent)
     elif event.type == 'payment_method.attached':

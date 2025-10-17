@@ -1,6 +1,20 @@
 import stripe
 from django.conf import settings
 from .models import Order
+from django.db import transaction
+from .tasks import order_created, payment_completed
+
+def handle_order_created(order):
+    """
+    Called right after an order is successfully created.
+    """
+    transaction.on_commit(lambda: order_created.delay(order.id))
+
+def handle_payment_confirmed(order_id):
+    """
+    Called right after an order's payment is confirmed.
+    """
+    payment_completed.delay(order_id)
 
 
 
@@ -10,8 +24,9 @@ def stripe_payment_intent(order):
     payment_intent = stripe.PaymentIntent.create(
         amount=total_amount,
         currency="usd",
+        payment_method="pm_card_visa",
         payment_method_types=["card"],
-        confirm=False,
+        confirm=True,
         metadata={'order_id': str(order.id)}
     )
     order.stripe_payment_intent_id = payment_intent.id
@@ -37,5 +52,7 @@ def handle_successful_payment(intent):
     order.pending_status = "C"  
     order.stripe_payment_intent_id = intent.id
     order.save()
+    
+    handle_payment_confirmed(order_id)
     
     print(f"Order {order_id} marked as completed.")

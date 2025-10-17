@@ -3,7 +3,8 @@ from .models import Cart, CartItem, Order, OrderItems
 from catalog.serializers import SimpleProductSerializer
 from catalog.models import Product
 from django.db import transaction
-from .services import stripe_payment_intent
+from .services import stripe_payment_intent, handle_order_created
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer(many = False)
@@ -107,6 +108,7 @@ class CreateOrderSerializer(serializers.Serializer):
                     ]
             OrderItems.objects.bulk_create(orderitems)
             Cart.objects.filter(id=cart_id).delete()
+            handle_order_created(order)
 
             client_secret = stripe_payment_intent(order)
 
