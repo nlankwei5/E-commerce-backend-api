@@ -3,6 +3,9 @@ import string
 from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from cloudinary.models import CloudinaryField
+from cloudinary.utils import cloudinary_url
+
 
 
 # Create your models here.
@@ -28,6 +31,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=30, unique=True, null=True, blank=True)
     name = models.CharField(max_length= 50, blank= False)
     description = models.TextField (blank=True)
+    image = CloudinaryField('file', resource_type="raw", allowed_formats=['jpg'], blank=False, null=True)
     price = models.DecimalField(max_digits=7, decimal_places=2, validators=[validate_price])
     category = models.ForeignKey(Category, on_delete= models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)

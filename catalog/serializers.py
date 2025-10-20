@@ -13,7 +13,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True)
     class Meta:
         model = Product
-        fields = ['id', 'sku', 'name', 'description', 'price', 'category', 'category_name','created_at', 'updated_at']
+        fields = ['id', 'sku', 'name', 'description', 'price','image', 'category', 'category_name','created_at', 'updated_at']
         read_only_fields = ['id', 'sku', 'created_at', 'updated_at']
 
     def validate_price(self, value):
@@ -28,6 +28,12 @@ class ProductSerializer(serializers.ModelSerializer):
         if len(value) > 255:
             raise serializers.ValidationError("Name too long")
         return value
+    
+    def validate_file(self, value):
+        if not value.endswith('jpg'):
+            raise serializers.ValidationError('File is not an image. Kindly upload an image')
+
+        
     
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
