@@ -43,6 +43,7 @@ class Product(models.Model):
 
         return f"{self.category.slug.upper()}-{random_part}"
     
+    
     def save(self, *args, **kwargs):
         if not self.sku:
             new_sku = self.generate_sku()
