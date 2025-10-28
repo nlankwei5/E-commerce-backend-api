@@ -29,9 +29,10 @@ class ProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Name too long")
         return value
     
-    def validate_file(self, value):
-        if not value.endswith('jpg'):
+    def validate_image(self, value):
+        if not str(value).lower().endswith('jpg'):
             raise serializers.ValidationError('File is not an image. Kindly upload an image')
+        return value
 
         
     

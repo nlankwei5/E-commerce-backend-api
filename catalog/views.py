@@ -23,7 +23,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     
 
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.select_related('category')
     serializer_class = ProductSerializer
     lookup_field = 'sku'
@@ -32,6 +32,14 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['name']
     ordering_fields = ['price']
     permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.action in ['create','update', 'partial_update', 'destroy']:
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
 
 
 
