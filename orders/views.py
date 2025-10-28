@@ -33,6 +33,8 @@ class CartItemsViewSet(viewsets.ModelViewSet):
         return CartItemSerializer
     
     def get_serializer_context(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return {} 
         return {'cart_id': self.kwargs['cart_pk']}
 
     
