@@ -10,6 +10,9 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return f"Cart {self.id} by {self.user.first_name}" 
 
@@ -42,7 +45,7 @@ class Order (models.Model):
     stripe_payment_intent_id = models.CharField(null=True, blank=True)
 
     def __str__(self):
-         return f"Order #{self.id} - {self.get_pending_status_display()}"
+        return f"Order #{self.id} - {self.get_pending_status_display()}"
     
 
 class OrderItems(models.Model):
